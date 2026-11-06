@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>市场总览</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>市场总览</h1>
+  <p class="note" th:if="${regime != null}" th:text="|已收盘日 ${regime.tradeDate()} · 策略 ${regime.strategyVersion()}|">日期</p>
+  <section class="stats" th:if="${regime != null}">
+    <div class="stat"><b th:text="${regime.regime()}">NEUTRAL</b><span>确认后的市场状态</span></div>
+    <div class="stat"><b th:text="${@fmt.pct(regime.marketBreadth())}">0%</b><span>市场广度</span></div>
+    <div class="stat"><b th:text="${@fmt.pct(regime.totalExposureLimit())}">35%</b><span>总建议仓位</span></div>
+    <div class="stat"><b th:text="${account == null ? '—' : @fmt.ratio(account.cash(), account.equity())}">100%</b><span>现金比例</span></div>
+  </section>
+  <section class="stats" th:if="${btc != null}">
+    <div class="stat"><b th:text="${@fmt.num(btc.totalScore())}">0</b><span th:text="|BTC 总分 · ${btc.signalLevel()}|">BTC</span></div>
+    <div class="stat"><b th:text="${@fmt.money(btc.price())}">0</b><span th:text="|BTC 收盘 · 日涨跌 ${@fmt.pct(btc.change1d())}|">价格</span></div>
+    <div class="stat" th:if="${eth != null}"><b th:text="${@fmt.num(eth.totalScore())}">0</b><span th:text="|ETH 总分 · ${eth.signalLevel()}|">ETH</span></div>
+    <div class="stat"><b th:text="${regime.riskOverride() == null ? '无' : regime.riskOverride()}">无</b><span>市场风险覆盖</span></div>
+  </section>
+  <h2>七个币种</h2>
+  <table>
+    <thead>
+    <tr><th>币种</th><th class="num">收盘</th><th class="num">总分</th><th>级别</th><th>当日信号</th><th>质量</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${rows}">
+      <td><a th:href="@{/assets/{symbol}(symbol=${row.symbol()})}" th:text="${row.symbol()}">BTCUSDT</a></td>
+      <td class="num" th:text="${@fmt.money(row.price())}">0</td>
+      <td class="num" th:text="${@fmt.num(row.totalScore())}">0</td>
+      <td th:text="${@fmt.text(row.signalLevel())}">BEARISH</td>
+      <td th:text="${@fmt.text(row.signalType())}">NO_TRADE</td>
+      <td th:text="${@fmt.text(row.quality())}">NORMAL</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

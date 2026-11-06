@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>日报</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>每日研究报告</h1>
+  <p class="error" th:if="${param.error != null}" th:text="${param.error}">错误</p>
+  <form method="post" action="/reports">
+    <button type="submit">生成最近一个已收盘交易日</button>
+  </form>
+  <p class="note" th:if="${#lists.isEmpty(reports)}">还没有日报。</p>
+  <table th:if="${!#lists.isEmpty(reports)}">
+    <thead><tr><th>日期</th><th>标题</th><th>摘要</th><th>版本</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${reports}">
+      <td><a th:href="@{/reports/{day}(day=${row.tradeDate()})}" th:text="${row.tradeDate()}">日期</a></td>
+      <td th:text="${row.title()}">标题</td>
+      <td th:text="${row.summary()}">摘要</td>
+      <td th:text="${row.featureVersion() + ' / ' + row.strategyVersion()}">版本</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

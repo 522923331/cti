@@ -1,5 +1,7 @@
 package com.cti.admin.job;
 
+import com.cti.common.job.JobTriggerResult;
+import com.cti.common.job.ManualJob;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import org.slf4j.Logger;
@@ -12,7 +14,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 
 @Component
-public class HealthProbeJob {
+public class HealthProbeJob implements ManualJob {
 
     public static final String REDIS_KEY = "cti:health:probe";
     public static final String SUCCESS = "SUCCESS";
@@ -26,6 +28,17 @@ public class HealthProbeJob {
     public HealthProbeJob(StringRedisTemplate redis, JobRunRepository jobRunRepository) {
         this.redis = redis;
         this.jobRunRepository = jobRunRepository;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.HEALTH_PROBE;
+    }
+
+    @Override
+    public JobTriggerResult run() {
+        ProbeResult result = execute();
+        return new JobTriggerResult(result.jobName(), result.status(), result.businessDate(), result.attempt(), result.message());
     }
 
     @XxlJob(JobCatalog.HEALTH_PROBE)

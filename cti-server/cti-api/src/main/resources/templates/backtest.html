@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title th:text="${run.strategyName()}">回测</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1 th:text="${run.strategyName()}">策略</h1>
+  <p class="note" th:text="|${run.runId()} · ${run.status()} · ${run.startDate()} → ${run.endDate()} · 版本 ${run.strategyVersion()}|">编号</p>
+  <section class="stats">
+    <div class="stat"><b th:text="${@fmt.pct(run.totalReturn())}">0</b><span>总收益</span></div>
+    <div class="stat"><b th:text="${@fmt.pct(run.excessReturn())}">0</b><span>相对 BTC 买入持有</span></div>
+    <div class="stat"><b th:text="${@fmt.pct(run.maxDrawdown())}">0</b><span>最大回撤</span></div>
+    <div class="stat"><b th:text="${@fmt.num(run.sharpeRatio())}">0</b><span>夏普，无风险利率 0</span></div>
+  </section>
+  <p class="note" th:text="|年化 ${@fmt.pct(run.annualizedReturn())} · 波动 ${@fmt.pct(run.annualizedVolatility())} · 索提诺 ${@fmt.num(run.sortinoRatio())} · 胜率 ${@fmt.pct(run.winRate())} · 盈利因子 ${@fmt.num(run.profitFactor())} · 持有天数 ${@fmt.num(run.averageHoldingDays())}|">指标</p>
+  <p class="note" th:text="|手续费 ${@fmt.money(run.totalFee())} · 滑点 ${@fmt.money(run.totalSlippage())} · 已平仓 ${run.totalTrades() == null ? '—' : run.totalTrades()}|">成本</p>
+  <p th:text="|验收 ${report.path('acceptance').path('passed').asText('空值')}|">验收</p>
+  <ul>
+    <li th:each="reason : ${report.path('acceptance').path('reasons')}" th:text="${reason.asText()}">原因</li>
+  </ul>
+  <div th:utext="${chart}">曲线</div>
+  <h2>资金曲线末端</h2>
+  <table>
+    <thead><tr><th>日期</th><th class="num">现金</th><th class="num">权益</th><th class="num">回撤</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${equity}">
+      <td th:text="${row.tradeDate()}">日期</td>
+      <td class="num" th:text="${@fmt.money(row.cash())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.equity())}">0</td>
+      <td class="num" th:text="${@fmt.pct(row.drawdown())}">0</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>交易明细</h2>
+  <p class="note" th:if="${#lists.isEmpty(trades)}">这次回测没有成交。</p>
+  <table th:if="${!#lists.isEmpty(trades)}">
+    <thead><tr><th>日期</th><th>币种</th><th>方向</th><th class="num">数量</th><th class="num">开盘</th><th class="num">成交</th><th class="num">手续费</th><th class="num">滑点</th><th class="num">盈亏</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${trades}">
+      <td th:text="${row.tradeDate()}">日期</td>
+      <td th:text="${row.symbol()}">币</td>
+      <td th:text="${row.side()}">BUY</td>
+      <td class="num" th:text="${row.quantity()}">0</td>
+      <td class="num" th:text="${@fmt.money(row.openPrice())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.fillPrice())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.fee())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.slippage())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.pnl())}">—</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

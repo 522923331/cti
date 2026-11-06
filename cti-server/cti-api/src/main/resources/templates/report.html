@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title th:text="${report.title()}">日报</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1 th:text="${report.title()}">日报</h1>
+  <p th:text="${report.summary()}">摘要</p>
+  <p class="note" th:text="|生成于 ${report.generatedAt()} · 特征 ${report.featureVersion()} · 策略 ${report.strategyVersion()}|">版本</p>
+  <article th:each="section : ${report.sections()}">
+    <h2 th:text="${section.title()}">章节</h2>
+    <p th:text="${section.conclusion()}">结论</p>
+    <table>
+      <thead><tr><th>来源</th><th>字段</th><th>值</th></tr></thead>
+      <tbody>
+      <tr th:each="item : ${section.evidence()}">
+        <td th:text="${item.source()}">表</td>
+        <td th:text="${item.key()}">字段</td>
+        <td th:text="${item.value()}">值</td>
+      </tr>
+      </tbody>
+    </table>
+  </article>
+</main>
+</body>
+</html>

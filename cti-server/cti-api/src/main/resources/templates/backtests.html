@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>回测</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>回测</h1>
+  <p class="error" th:if="${error != null}" th:text="${error}">错误</p>
+  <p class="note">初始资金固定为策略里的 100,000 USDT。资产池是全部已启用币种，因为广度和 BTC 过滤按这个池子计算。手续费和滑点用成本情景，各占单边总成本的一半。</p>
+  <h2>创建</h2>
+  <form method="post" action="/backtests">
+    <label>策略
+      <select name="strategy">
+        <option th:each="name : ${strategies}" th:value="${name}" th:text="${name}">CTI</option>
+      </select>
+    </label>
+    <label>开始<input type="date" name="startDate"></label>
+    <label>结束<input type="date" name="endDate"></label>
+    <label>成本
+      <select name="costScenario">
+        <option value="LOW">LOW 0.025% + 0.025%</option>
+        <option value="BASE" selected>BASE 0.10% + 0.10%</option>
+        <option value="HIGH">HIGH 0.20% + 0.20%</option>
+      </select>
+    </label>
+    <button type="submit">运行</button>
+  </form>
+  <h2>对照</h2>
+  <form method="post" action="/backtests/compare">
+    <label>策略
+      <select name="strategies" multiple size="8">
+        <option th:each="name : ${strategies}" th:value="${name}" th:text="${name}" selected>CTI</option>
+      </select>
+    </label>
+    <label>开始<input type="date" name="startDate"></label>
+    <label>结束<input type="date" name="endDate"></label>
+    <label>成本
+      <select name="costScenario">
+        <option value="BASE" selected>BASE</option>
+        <option value="LOW">LOW</option>
+        <option value="HIGH">HIGH</option>
+      </select>
+    </label>
+    <button type="submit">对比</button>
+  </form>
+  <form method="post" action="/backtests/walk-forward">
+    <input type="hidden" name="costScenario" value="BASE">
+    <button type="submit">走步验证</button>
+  </form>
+  <h2>已启用资产</h2>
+  <p th:each="asset : ${assets}" th:text="${asset.symbol() + ' ' + asset.exchangeStatus()}">BTCUSDT</p>
+  <h2>结果</h2>
+  <table>
+    <thead><tr><th>编号</th><th>策略</th><th>区间</th><th>状态</th><th class="num">总收益</th><th class="num">最大回撤</th><th class="num">已平仓</th></tr></thead>
+    <tbody>
+    <tr th:each="run : ${runs}">
+      <td><a th:href="@{/backtests/{id}(id=${run.runId()})}" th:text="${#strings.abbreviate(run.runId(), 18)}">id</a></td>
+      <td th:text="${run.strategyName()}">策略</td>
+      <td th:text="${run.startDate() + ' → ' + run.endDate()}">区间</td>
+      <td th:text="${run.status()}">状态</td>
+      <td class="num" th:text="${@fmt.pct(run.totalReturn())}">0</td>
+      <td class="num" th:text="${@fmt.pct(run.maxDrawdown())}">0</td>
+      <td class="num" th:text="${run.totalTrades() == null ? '—' : run.totalTrades()}">0</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>监控</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>系统监控</h1>
+  <p th:text="|总体 ${health.status()} · ${health.time()}|">状态</p>
+  <table>
+    <thead><tr><th>组件</th><th>状态</th><th>说明</th></tr></thead>
+    <tbody>
+    <tr th:each="item : ${health.components()}">
+      <td th:text="${item.key}">mysql</td>
+      <td th:text="${item.value.status()}">UP</td>
+      <td th:text="${item.value.detail()}">说明</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>数据质量</h2>
+  <table>
+    <thead><tr><th>币种</th><th>周期</th><th>检查日</th><th>状态</th><th class="num">缺失</th><th class="num">异常</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${quality}">
+      <td th:text="${row.symbol()}">BTC</td>
+      <td th:text="${row.intervalCode()}">1d</td>
+      <td th:text="${row.checkDate()}">日期</td>
+      <td th:text="${row.status()}">NORMAL</td>
+      <td class="num" th:text="${row.missingCount()}">0</td>
+      <td class="num" th:text="${row.anomalyCount()}">0</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>任务</h2>
+  <table>
+    <thead><tr><th>名称</th><th>阶段</th><th>说明</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${catalog}">
+      <td th:text="${row.name()}">任务</td>
+      <td th:text="${row.phase()}">6</td>
+      <td th:text="${row.description()}">说明</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>最近执行</h2>
+  <table>
+    <thead><tr><th>任务</th><th>业务日</th><th>状态</th><th class="num">次数</th><th>结果</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${jobs}">
+      <td th:text="${row.jobName()}">任务</td>
+      <td th:text="${row.businessDate()}">日期</td>
+      <td th:text="${row.status()}">SUCCESS</td>
+      <td class="num" th:text="${row.attempt()}">1</td>
+      <td th:text="${row.message()}">消息</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

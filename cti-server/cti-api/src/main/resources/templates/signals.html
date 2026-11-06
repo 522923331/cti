@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>交易信号</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>交易信号</h1>
+  <form method="get" action="/signals">
+    <label>最新交易日类型
+      <select name="type">
+        <option value="">全部</option>
+        <option value="BUY" th:selected="${type == 'BUY'}">买入</option>
+        <option value="HOLD" th:selected="${type == 'HOLD'}">持有</option>
+        <option value="REDUCE" th:selected="${type == 'REDUCE'}">减仓</option>
+        <option value="SELL" th:selected="${type == 'SELL'}">卖出</option>
+        <option value="WATCH" th:selected="${type == 'WATCH'}">观察</option>
+        <option value="NO_TRADE" th:selected="${type == 'NO_TRADE'}">不交易</option>
+      </select>
+    </label>
+    <button type="submit">筛选</button>
+  </form>
+  <table>
+    <thead>
+    <tr><th>币种</th><th>时间</th><th>类型</th><th>状态</th><th class="num">入场</th><th class="num">止损</th><th class="num">建议仓位</th><th class="num">风险金额</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${latest}">
+      <td><a th:href="@{/signals/{id}(id=${row.signalId()})}" th:text="${row.symbol()}">BTC</a></td>
+      <td th:text="${row.signalTime()}">时间</td>
+      <td th:text="${row.signalType()}">类型</td>
+      <td th:text="${row.signalStatus()}">状态</td>
+      <td class="num" th:text="${@fmt.money(row.entryPrice())}">—</td>
+      <td class="num" th:text="${@fmt.money(row.stopPrice())}">—</td>
+      <td class="num" th:text="${@fmt.pct(row.suggestedPosition())}">—</td>
+      <td class="num" th:text="${@fmt.money(row.riskAmount())}">—</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>历史买入、减仓和卖出</h2>
+  <table>
+    <thead><tr><th>日期</th><th>币种</th><th>类型</th><th>状态</th><th>特征 / 策略</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${history}">
+      <td><a th:href="@{/signals/{id}(id=${row.signalId()})}" th:text="${row.tradeDate()}">日期</a></td>
+      <td th:text="${row.symbol()}">币</td>
+      <td th:text="${row.signalType()}">类型</td>
+      <td th:text="${row.signalStatus()}">状态</td>
+      <td th:text="${row.featureVersion() + ' / ' + row.strategyVersion()}">版本</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

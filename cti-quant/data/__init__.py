@@ -1,1 +1,1 @@
-"""Market data access. Implemented in Phase 1."""
+"""Market reads for the quant service."""

@@ -78,6 +78,7 @@
     "pullbackScore": 65,
     "breakoutScore": 70,
     "minimumTrendScore": 60,
+    "breakoutTrendScore": 65,
     "breakoutVolumeRatio": 1.5,
     "breakoutLookback": 20,
     "pullbackAtrMultiplier4h": 0.5,
@@ -131,6 +132,8 @@
     "maxAltcoinExposure": 0.30,
     "minCashReserve": 0.20,
     "warningPositionScale": 0.7,
+    "reduceFraction": 0.5,
+    "minPositionWeight": 0.01,
     "correlationWindow": 30,
     "correlationCluster": 0.80,
     "drawdown": [

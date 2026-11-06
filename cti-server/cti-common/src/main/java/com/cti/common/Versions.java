@@ -10,6 +10,8 @@ public final class Versions {
     public static final String FEATURE = "features-1.0.0";
     public static final String STRATEGY_NAME = "CTI_TREND_V1";
     public static final String STRATEGY = "1.0.0";
+    public static final String EXCHANGE = "BINANCE";
+    public static final String RAW_DATA = "raw-1.0.0";
 
     private Versions() {
     }

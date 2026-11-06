@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>币种排行</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>币种排行榜</h1>
+  <p class="note">价格、涨跌和收益都来自最近两根已收盘日线。未收盘的当日 K 线不参与。</p>
+  <form method="get" action="/ranking">
+    <label>排序
+      <select name="sort">
+        <option value="total" th:selected="${sort == 'total'}">总分</option>
+        <option value="trend" th:selected="${sort == 'trend'}">趋势分</option>
+        <option value="flow" th:selected="${sort == 'flow'}">资金流分</option>
+        <option value="change" th:selected="${sort == 'change'}">日涨跌</option>
+        <option value="return7" th:selected="${sort == 'return7'}">7 日收益</option>
+        <option value="return14" th:selected="${sort == 'return14'}">14 日收益</option>
+        <option value="return30" th:selected="${sort == 'return30'}">30 日收益</option>
+        <option value="price" th:selected="${sort == 'price'}">价格</option>
+        <option value="symbol" th:selected="${sort == 'symbol'}">代码</option>
+      </select>
+    </label>
+    <label>级别
+      <select name="level">
+        <option value="">全部</option>
+        <option th:each="item : ${levels}" th:value="${item}" th:text="${item}" th:selected="${item == level}">BEARISH</option>
+      </select>
+    </label>
+    <button type="submit">筛选</button>
+  </form>
+  <table>
+    <thead>
+    <tr>
+      <th>Symbol</th><th class="num">Price</th><th class="num">24H</th><th class="num">7D</th><th class="num">14D</th><th class="num">30D</th>
+      <th class="num">EMA20</th><th class="num">EMA50</th><th class="num">EMA200</th>
+      <th class="num">Trend</th><th class="num">Flow</th><th class="num">Derivatives</th><th class="num">Total</th><th>Signal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${rows}">
+      <td><a th:href="@{/assets/{symbol}(symbol=${row.symbol()})}" th:text="${row.symbol()}">BTCUSDT</a></td>
+      <td class="num" th:text="${@fmt.money(row.price())}">0</td>
+      <td class="num" th:text="${@fmt.pct(row.change1d())}">0</td>
+      <td class="num" th:text="${@fmt.pct(row.return7d())}">0</td>
+      <td class="num" th:text="${@fmt.pct(row.return14d())}">0</td>
+      <td class="num" th:text="${@fmt.pct(row.return30d())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.ema20())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.ema50())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.ema200())}">0</td>
+      <td class="num" th:text="${@fmt.num(row.trendScore())}">0</td>
+      <td class="num" th:text="${@fmt.num(row.flowScore())}">0</td>
+      <td class="num" th:text="${@fmt.num(row.derivativesScore())}">—</td>
+      <td class="num" th:text="${@fmt.num(row.totalScore())}">0</td>
+      <td th:text="${@fmt.text(row.signalType())}">NO_TRADE</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

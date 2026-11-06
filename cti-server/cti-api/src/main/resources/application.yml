@@ -30,6 +30,17 @@ mybatis-plus:
     banner: false
 
 cti:
+  binance:
+    base-url: https://api.binance.com
+    fallback-base-url: https://data-api.binance.vision
+    max-retries: 5
+    history-days: 800
+    request-timeout-seconds: 30
+  data:
+    dir: ${CTI_DATA_DIR:data}
+  quant:
+    base-url: ${CTI_QUANT_URL:http://127.0.0.1:8090}
+    request-timeout-seconds: 120
   xxl-job:
     enabled: true
     admin-addresses: ${CTI_XXL_ADMIN:http://127.0.0.1:8088/xxl-job-admin}

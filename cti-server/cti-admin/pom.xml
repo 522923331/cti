@@ -16,8 +16,36 @@
             <artifactId>cti-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.cti</groupId>
+            <artifactId>cti-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cti</groupId>
+            <artifactId>cti-feature</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cti</groupId>
+            <artifactId>cti-strategy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cti</groupId>
+            <artifactId>cti-signal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cti</groupId>
+            <artifactId>cti-portfolio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.cti</groupId>
+            <artifactId>cti-backtest</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

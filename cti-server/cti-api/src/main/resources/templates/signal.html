@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title th:text="${signal.symbol() + ' ' + signal.signalType()}">信号</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1 th:text="${signal.symbol() + ' ' + signal.signalType()}">信号</h1>
+  <p class="note" th:text="|${signal.signalTime()} · ${signal.signalStatus()} · 特征 ${signal.featureVersion()} · 策略 ${signal.strategyVersion()}|">版本</p>
+  <p class="note" th:text="${signal.signalId()}">编号</p>
+  <section class="stats">
+    <div class="stat"><b th:text="${@fmt.num(signal.score())}">0</b><span>总分</span></div>
+    <div class="stat"><b th:text="${@fmt.money(signal.entryPrice())}">—</b><span>建议入场价，决策日收盘</span></div>
+    <div class="stat"><b th:text="${@fmt.money(signal.stopPrice())}">—</b><span>建议止损价</span></div>
+    <div class="stat"><b th:text="${@fmt.pct(signal.suggestedPosition())}">—</b><span>建议仓位</span></div>
+  </section>
+  <h2>产生原因</h2>
+  <pre th:text="${@fmt.json(signal.signalReason())}">原因</pre>
+  <h2>失效条件</h2>
+  <pre th:text="${@fmt.json(signal.invalidationReason())}">失效</pre>
+  <p><a th:href="@{/assets/{symbol}(symbol=${signal.symbol()})}">回到这个币</a></p>
+</main>
+</body>
+</html>

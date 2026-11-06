@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title th:text="${asset.symbol()}">资产</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1 th:text="${asset.assetName() + ' ' + asset.symbol()}">Bitcoin</h1>
+  <p class="note" th:text="|交易所状态 ${asset.exchangeStatus()} · 日涨跌 ${@fmt.pct(change1d)}|">状态</p>
+  <section class="stats" th:if="${feature != null}">
+    <div class="stat"><b th:text="${@fmt.num(score == null ? null : score.totalScore())}">0</b><span th:text="${score == null ? '还没有评分' : score.signalLevel()}">级别</span></div>
+    <div class="stat"><b th:text="${@fmt.money(feature.atr14())}">0</b><span>ATR14</span></div>
+    <div class="stat"><b th:text="${@fmt.num(feature.adx14())}">0</b><span>ADX14</span></div>
+    <div class="stat"><b th:text="${@fmt.num(feature.rsi14())}">0</b><span>RSI14</span></div>
+  </section>
+  <h2>日线收盘与均线</h2>
+  <p class="legend"><span>收盘</span><span>EMA20</span><span>EMA50</span><span>EMA200</span></p>
+  <div th:utext="${dailyChart}">图</div>
+  <h2>4 小时收盘</h2>
+  <p class="note">4 小时图只画已收盘 K 线的收盘价。4 小时均线没有单独落库。</p>
+  <div th:utext="${fourHourChart}">图</div>
+  <h2>最近已收盘日线</h2>
+  <table>
+    <thead><tr><th>日期</th><th class="num">开</th><th class="num">高</th><th class="num">低</th><th class="num">收</th><th class="num">量</th></tr></thead>
+    <tbody>
+    <tr th:each="bar : ${dailyBars}">
+      <td th:text="${@fmt.day(bar.openTime())}">2026-11-05</td>
+      <td class="num" th:text="${@fmt.money(bar.open())}">0</td>
+      <td class="num" th:text="${@fmt.money(bar.high())}">0</td>
+      <td class="num" th:text="${@fmt.money(bar.low())}">0</td>
+      <td class="num" th:text="${@fmt.money(bar.close())}">0</td>
+      <td class="num" th:text="${@fmt.num(bar.volume())}">0</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>最近已收盘 4 小时</h2>
+  <table>
+    <thead><tr><th>开盘时间 UTC</th><th class="num">开</th><th class="num">高</th><th class="num">低</th><th class="num">收</th><th class="num">量</th></tr></thead>
+    <tbody>
+    <tr th:each="bar : ${fourHourBars}">
+      <td th:text="${@fmt.day(bar.openTime()) + ' ' + @fmt.clock(bar.openTime())}">时间</td>
+      <td class="num" th:text="${@fmt.money(bar.open())}">0</td>
+      <td class="num" th:text="${@fmt.money(bar.high())}">0</td>
+      <td class="num" th:text="${@fmt.money(bar.low())}">0</td>
+      <td class="num" th:text="${@fmt.money(bar.close())}">0</td>
+      <td class="num" th:text="${@fmt.num(bar.volume())}">0</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>资金与衍生品</h2>
+  <p th:if="${feature != null}" th:text="|Spot Delta ${@fmt.money(feature.spotDelta())} · 比率 ${@fmt.pct(feature.spotDeltaRatio())} · 成交量比 ${@fmt.num(feature.volumeRatio20d())}|">资金</p>
+  <p class="note">持仓量和资金费率没有采集，页面保持空值。</p>
+  <p th:if="${feature != null}" th:text="|OI 1日 ${@fmt.text(feature.oiChange1d())} · OI 7日 ${@fmt.text(feature.oiChange7d())} · Funding ${@fmt.text(feature.fundingRate())} · Funding Z ${@fmt.text(feature.fundingZscore())}|">衍生品</p>
+  <h2>评分原因</h2>
+  <pre th:if="${score != null}" th:text="${@fmt.json(score.reason())}">原因</pre>
+  <h2>评分变化</h2>
+  <table>
+    <thead><tr><th>日期</th><th class="num">趋势</th><th class="num">资金流</th><th class="num">衍生品</th><th class="num">总分</th><th>级别</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${scoreHistory}">
+      <td th:text="${row.tradeDate()}">日期</td>
+      <td class="num" th:text="${@fmt.num(row.trendScore())}">0</td>
+      <td class="num" th:text="${@fmt.num(row.flowScore())}">0</td>
+      <td class="num" th:text="${@fmt.num(row.derivativesScore())}">—</td>
+      <td class="num" th:text="${@fmt.num(row.totalScore())}">0</td>
+      <td th:text="${@fmt.text(row.signalLevel())}">级别</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>历史信号</h2>
+  <p class="note" th:if="${#lists.isEmpty(signals)}">这段历史里没有观察、持有、买入、减仓或卖出信号。</p>
+  <table th:if="${!#lists.isEmpty(signals)}">
+    <thead><tr><th>日期</th><th>类型</th><th>状态</th><th class="num">建议仓位</th><th>版本</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${signals}">
+      <td><a th:href="@{/signals/{id}(id=${row.signalId()})}" th:text="${row.tradeDate()}">日期</a></td>
+      <td th:text="${row.signalType()}">BUY</td>
+      <td th:text="${row.signalStatus()}">WARNING</td>
+      <td class="num" th:text="${@fmt.pct(row.suggestedPosition())}">0</td>
+      <td th:text="${row.featureVersion() + ' / ' + row.strategyVersion()}">版本</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

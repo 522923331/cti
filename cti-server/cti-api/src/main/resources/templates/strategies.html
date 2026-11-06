@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>策略</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>策略配置</h1>
+  <p class="note">这里只展示已落库的版本。改公式要换策略版本，不能在页面上覆盖当前配置。</p>
+  <article th:each="row : ${configs}">
+    <h2 th:text="${row.strategy_name + ' ' + row.strategy_version}">名称</h2>
+    <p th:text="${row.description}">说明</p>
+    <p class="note" th:text="${row.enabled == 1 || row.enabled == true ? '启用' : '停用'}">状态</p>
+    <pre th:text="${@fmt.json(row.config_json)}">配置</pre>
+  </article>
+</main>
+</body>
+</html>

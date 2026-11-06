@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>组合</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>组合风险</h1>
+  <p class="note" th:if="${account == null}">还没有研究账户。</p>
+  <section class="stats" th:if="${account != null}">
+    <div class="stat"><b th:text="${@fmt.money(account.equity())}">0</b><span th:text="|权益 ${account.quoteAsset()} · ${account.asOfDate()}|">权益</span></div>
+    <div class="stat"><b th:text="${@fmt.money(account.cash())}">0</b><span th:text="|现金比例 ${@fmt.ratio(account.cash(), account.equity())}|">现金</span></div>
+    <div class="stat"><b th:text="${@fmt.money(account.peakEquity())}">0</b><span>峰值权益</span></div>
+    <div class="stat"><b th:text="${account.strategyVersion()}">1.0.0</b><span th:text="${account.strategyName()}">策略</span></div>
+  </section>
+  <h2>持仓</h2>
+  <p class="note" th:if="${#lists.isEmpty(positions)}">当前没有持仓。</p>
+  <table th:if="${!#lists.isEmpty(positions)}">
+    <thead><tr><th>币种</th><th class="num">数量</th><th class="num">成本</th><th class="num">止损</th><th class="num">市值</th><th>开仓日</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${positions}">
+      <td th:text="${row.symbol()}">BTC</td>
+      <td class="num" th:text="${row.quantity()}">0</td>
+      <td class="num" th:text="${@fmt.money(row.averageEntryPrice())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.stopPrice())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.marketValue())}">0</td>
+      <td th:text="${row.openedOn()}">日期</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>风险</h2>
+  <pre th:text="${@fmt.json(risk)}">风险</pre>
+  <h2>近期权益</h2>
+  <table>
+    <thead><tr><th>日期</th><th class="num">现金</th><th class="num">权益</th><th class="num">回撤</th><th class="num">敞口</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${equity}">
+      <td th:text="${row.tradeDate()}">日期</td>
+      <td class="num" th:text="${@fmt.money(row.cash())}">0</td>
+      <td class="num" th:text="${@fmt.money(row.equity())}">0</td>
+      <td class="num" th:text="${@fmt.pct(row.drawdown())}">0</td>
+      <td class="num" th:text="${@fmt.pct(row.exposure())}">0</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>
