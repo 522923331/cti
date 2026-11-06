@@ -1,0 +1,42 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: cti-api
+  datasource:
+    url: ${CTI_MYSQL_URL:jdbc:mysql://127.0.0.1:3306/cti?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8&serverTimezone=UTC&connectionTimeZone=UTC}
+    username: ${CTI_MYSQL_USER:cti}
+    password: ${CTI_MYSQL_PASSWORD:cti}
+    hikari:
+      connection-init-sql: SET time_zone = '+00:00'
+  data:
+    redis:
+      host: ${CTI_REDIS_HOST:127.0.0.1}
+      port: ${CTI_REDIS_PORT:6379}
+      timeout: 2s
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+
+cti:
+  xxl-job:
+    enabled: true
+    admin-addresses: ${CTI_XXL_ADMIN:http://127.0.0.1:8088/xxl-job-admin}
+    access-token: default_token
+    app-name: cti-executor
+    port: 9999
+    log-path: logs/xxl-job
+    log-retention-days: 30
+  admin:
+    manual-trigger-enabled: true

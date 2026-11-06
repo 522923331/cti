@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS,UTC} %-5level [%X{traceId}] %logger{40} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.cti" level="INFO"/>
+    <logger name="org.flywaydb" level="INFO"/>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

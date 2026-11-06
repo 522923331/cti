@@ -1,0 +1,160 @@
+{
+  "strategyName": "CTI_TREND_V1",
+  "strategyVersion": "1.0.0",
+  "assets": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "LINKUSDT", "AVAXUSDT"],
+  "timeframes": {
+    "primary": "1d",
+    "secondary": "4h",
+    "macro": "1w"
+  },
+  "indicators": {
+    "emaShort": 20,
+    "emaMedium": 50,
+    "emaLong": 200,
+    "atrPeriod": 14,
+    "adxPeriod": 14,
+    "rsiPeriod": 14,
+    "momentumPeriods": [7, 14, 30, 90],
+    "volumePeriod": 20,
+    "volatilityPeriod": 20,
+    "zscoreWindow": 252,
+    "emaSlopeLookback": 10,
+    "annualizationDays": 365,
+    "swingLeft": 2,
+    "swingRight": 2,
+    "swingLookbackBars": 120,
+    "minBarsForStructure": 60
+  },
+  "scoreWeights": {
+    "market": 0.20,
+    "trend": 0.35,
+    "flow": 0.25,
+    "derivatives": 0.10,
+    "sentiment": 0.10
+  },
+  "marketScoreWeights": {
+    "btcTrend": 0.40,
+    "breadth": 0.30,
+    "btcVolatility": 0.30
+  },
+  "trendScoreWeights": {
+    "ema": 0.30,
+    "momentum": 0.25,
+    "adx": 0.20,
+    "structure": 0.25
+  },
+  "momentumWeights": {
+    "return7d": 0.20,
+    "return14d": 0.35,
+    "return30d": 0.30,
+    "return90d": 0.15
+  },
+  "flowScoreWeights": {
+    "volume": 0.35,
+    "spotDelta": 0.35,
+    "spotDelta7d": 0.30
+  },
+  "sentiment": {
+    "mode": "ABSENT"
+  },
+  "normalization": {
+    "clipZ": 2,
+    "missingPolicy": "RENORMALIZE_AVAILABLE",
+    "coreComponents": ["market", "trend", "flow"]
+  },
+  "regime": {
+    "confirmDays": 2,
+    "breadthBullish": 0.60,
+    "breadthBearish": 0.30,
+    "exposureLimit": {
+      "BULLISH": 0.80,
+      "NEUTRAL": 0.35,
+      "BEARISH": 0.10
+    },
+    "emergencyBtcDailyReturn": -0.08,
+    "emergencyBreadthDrop": 0.40
+  },
+  "entry": {
+    "pullbackScore": 65,
+    "breakoutScore": 70,
+    "minimumTrendScore": 60,
+    "breakoutVolumeRatio": 1.5,
+    "breakoutLookback": 20,
+    "pullbackAtrMultiplier4h": 0.5,
+    "pullbackDailyAtrLower": 1.0,
+    "pullbackDailyAtrUpper": 0.5,
+    "spotDelta7dMinScore": -40,
+    "watchTotalScore": 50
+  },
+  "exit": {
+    "timeReviewDays": 14,
+    "timeSellBelowScore": 50,
+    "timeReduceBelowScore": 65
+  },
+  "volumeScore": {
+    "highRatio": 1.5,
+    "midRatio": 1.0,
+    "lowRatio": 0.7,
+    "highWithUp": 80,
+    "midWithUp": 40,
+    "highWithDown": -80,
+    "midWithDown": -40,
+    "low": -20
+  },
+  "volatilityScore": {
+    "normalAbsZ": 1,
+    "elevatedAbsZ": 2,
+    "normal": 0,
+    "elevated": -40,
+    "extreme": -80
+  },
+  "derivativesRisk": {
+    "fundingZSoft": 2,
+    "fundingZHard": 3,
+    "fundingSoftPoints": 40,
+    "fundingHardPoints": 60,
+    "oiZPoints": 30,
+    "oiZThreshold": 2,
+    "crowdedExtraPoints": 30,
+    "oiCrowdingChange7d": 0
+  },
+  "risk": {
+    "accountCapital": 100000,
+    "riskPerTrade": 0.005,
+    "atrStopMultiplier": 2.0,
+    "maxHoldingDays": 14,
+    "maxHoldingAssets": 5,
+    "maxTotalExposure": 0.80,
+    "maxSingleAssetWeight": 0.15,
+    "maxBtcWeight": 0.50,
+    "maxEthWeight": 0.35,
+    "maxAltcoinExposure": 0.30,
+    "minCashReserve": 0.20,
+    "warningPositionScale": 0.7,
+    "correlationWindow": 30,
+    "correlationCluster": 0.80,
+    "drawdown": [
+      {"drawdown": 0.05, "riskBudgetScale": 0.75, "pauseNewEntries": false},
+      {"drawdown": 0.08, "riskBudgetScale": 0.50, "pauseNewEntries": false},
+      {"drawdown": 0.12, "riskBudgetScale": 0.00, "pauseNewEntries": true}
+    ]
+  },
+  "execution": {
+    "commissionRate": 0.001,
+    "slippageRate": 0.001,
+    "executionTiming": "NEXT_BAR_OPEN",
+    "initialCapital": 100000,
+    "quoteAsset": "USDT"
+  },
+  "costScenarios": [
+    {"name": "LOW", "oneWayTotalCost": 0.0005},
+    {"name": "BASE", "oneWayTotalCost": 0.0020},
+    {"name": "HIGH", "oneWayTotalCost": 0.0040}
+  ],
+  "dataQuality": {
+    "closedBarsOnly": true,
+    "derivativesMissing": "WARNING",
+    "klineMissing": "INVALID",
+    "coreFeatureNull": "INVALID"
+  }
+}
