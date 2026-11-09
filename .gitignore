@@ -1,7 +1,7 @@
 target/
 deploy/.env
 logs/
-data/
+/data/
 .idea/
 *.iml
 .DS_Store
