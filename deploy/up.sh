@@ -60,7 +60,7 @@ EOF
 fi
 
 if [[ -z "${CTI_DOCKER_MIRROR:-}" && -f "$env_file" ]]; then
-  CTI_DOCKER_MIRROR="$(grep -E '^CTI_DOCKER_MIRROR=' "$env_file" | tail -1 | cut -d= -f2- | tr -d '"' | tr -d "'")"
+  CTI_DOCKER_MIRROR="$(grep -E '^CTI_DOCKER_MIRROR=' "$env_file" | tail -1 | cut -d= -f2- | tr -d '"' | tr -d "'" || true)"
 fi
 
 if [[ -n "${CTI_DOCKER_MIRROR:-}" ]]; then
