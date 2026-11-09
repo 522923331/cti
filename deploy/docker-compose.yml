@@ -1,0 +1,105 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: cti
+      MYSQL_USER: cti
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+00:00
+      - --bind-address=0.0.0.0
+    volumes:
+      - cti-mysql:/var/lib/mysql
+      - ../sql/xxl_job_2.4.0.sql:/docker-entrypoint-initdb.d/01-xxl_job.sql:ro
+      - ../sql/xxl_job_cti_seed.sql:/docker-entrypoint-initdb.d/02-xxl_job_cti.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  quant:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.quant
+    environment:
+      CTI_MYSQL_URL: mysql+pymysql://cti:${MYSQL_PASSWORD}@mysql:3306/cti
+      CTI_REDIS_HOST: redis
+      CTI_REDIS_PORT: "6379"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    environment:
+      JAVA_TOOL_OPTIONS: -Duser.timezone=UTC
+      CTI_MYSQL_URL: jdbc:mysql://mysql:3306/cti?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8&serverTimezone=UTC&connectionTimeZone=UTC
+      CTI_MYSQL_USER: cti
+      CTI_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      CTI_REDIS_HOST: redis
+      CTI_REDIS_PORT: "6379"
+      CTI_QUANT_URL: http://quant:8090
+      CTI_DATA_DIR: /var/lib/cti
+      CTI_XXL_ADMIN: http://xxl-job-admin:8080/xxl-job-admin
+    volumes:
+      - cti-data:/var/lib/cti
+    ports:
+      - "${CTI_HTTP_BIND:-127.0.0.1:8081}:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      quant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8081/api/v1/admin/system-health"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+
+  xxl-job-admin:
+    profiles: ["scheduler"]
+    image: xuxueli/xxl-job-admin:2.4.0
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PARAMS: >-
+        --spring.datasource.url=jdbc:mysql://mysql:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=UTC
+        --spring.datasource.username=root
+        --spring.datasource.password=${MYSQL_ROOT_PASSWORD}
+        --spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+        --xxl.job.accessToken=default_token
+    ports:
+      - "127.0.0.1:8088:8080"
+
+volumes:
+  cti-mysql:
+  cti-data:

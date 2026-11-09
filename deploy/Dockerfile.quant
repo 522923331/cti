@@ -1,0 +1,7 @@
+FROM python:3.11-slim
+WORKDIR /opt/cti-quant
+COPY cti-quant/requirements.txt /opt/cti-quant/requirements.txt
+RUN pip install --no-cache-dir -r /opt/cti-quant/requirements.txt
+COPY cti-quant /opt/cti-quant
+EXPOSE 8090
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8090"]

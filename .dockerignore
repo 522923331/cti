@@ -1,0 +1,11 @@
+.git
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/target
+data
+logs
+deploy/.env
+*.iml
+.idea
+.DS_Store

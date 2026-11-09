@@ -1,5 +1,7 @@
 # Linux 部署
 
+Alibaba Cloud Linux 4 容器优化版在仓库目录执行 `sudo bash deploy/up.sh`。脚本会安装系统源里的 moby 和 docker compose，再启动 MySQL、Redis、Python 和 Java。
+
 这是研究系统，只拉币安公开行情，只做模拟。服务器不需要交易 API Key。
 
 一台机器上有四个进程：MySQL、Redis、Python 计算服务、Java 页面和任务。XXL-Job Admin 只负责定时调用，不负责计算。系统没有登录。接口在本机用手动触发就能跑完全部任务。
