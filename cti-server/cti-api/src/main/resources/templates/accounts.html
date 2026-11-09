@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>模拟账户</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>模拟账户</h1>
+  <p class="note">这里是 V1.2 的独立账本。研究账户 CTI_TREND_V1 仍在组合页，不会被这里改写。</p>
+  <table>
+    <thead>
+    <tr><th>账户</th><th>名称</th><th>类型</th><th>状态</th><th class="num">可用</th><th class="num">冻结</th><th class="num">总额</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${accounts}">
+      <td><a th:href="@{/accounts/{id}(id=${row.accountId()})}" th:text="${row.accountId()}">paper</a></td>
+      <td th:text="${row.name()}">名称</td>
+      <td th:text="${row.type()}">PAPER</td>
+      <td th:text="${row.status()}">ACTIVE</td>
+      <td class="num" th:text="${row.available().toPlainString()}">0</td>
+      <td class="num" th:text="${row.frozen().toPlainString()}">0</td>
+      <td class="num" th:text="${row.total().toPlainString()}">0</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

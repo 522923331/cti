@@ -7,6 +7,8 @@ public class BinanceMarketProperties {
 
     private String baseUrl = "https://api.binance.com";
     private String fallbackBaseUrl = "https://data-api.binance.vision";
+    private String futuresBaseUrl = "https://fapi.binance.com";
+    private String announcementBaseUrl = "https://www.binance.com";
     private int maxRetries = 5;
     private int historyDays = 800;
     private int requestTimeoutSeconds = 30;
@@ -25,6 +27,22 @@ public class BinanceMarketProperties {
 
     public void setFallbackBaseUrl(String fallbackBaseUrl) {
         this.fallbackBaseUrl = fallbackBaseUrl;
+    }
+
+    public String getFuturesBaseUrl() {
+        return futuresBaseUrl;
+    }
+
+    public void setFuturesBaseUrl(String futuresBaseUrl) {
+        this.futuresBaseUrl = futuresBaseUrl;
+    }
+
+    public String getAnnouncementBaseUrl() {
+        return announcementBaseUrl;
+    }
+
+    public void setAnnouncementBaseUrl(String announcementBaseUrl) {
+        this.announcementBaseUrl = announcementBaseUrl;
     }
 
     public int getMaxRetries() {

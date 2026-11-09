@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>情报评分</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>V1.1 情报评分</h1>
+  <p class="note">这是 intelligence-1.1.0，不改变 V1.0 的评分和信号。新闻不能单独产生买入。</p>
+  <h2>最近一个已评分交易日</h2>
+  <table>
+    <thead>
+    <tr><th>币种</th><th>日期</th><th class="num">趋势</th><th class="num">风险</th><th class="num">情绪</th><th class="num">置信度</th><th>风险等级</th><th>信号</th><th>数据</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${scores}">
+      <td th:text="${row.symbol()}">BTCUSDT</td>
+      <td th:text="${row.tradeDate()}">2026-11-05</td>
+      <td class="num" th:text="${row.trendScore()}">0</td>
+      <td class="num" th:text="${row.riskScore()}">0</td>
+      <td class="num" th:text="${row.sentimentScore()}">—</td>
+      <td class="num" th:text="${row.confidence()}">0</td>
+      <td th:text="${row.riskLevel()}">LOW</td>
+      <td th:text="${row.signalType()}">NO_TRADE</td>
+      <td th:text="${row.dataStatus()}">PARTIAL</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>结论</h2>
+  <ul>
+    <li th:each="item : ${conclusions}" th:text="${item}">结论</li>
+  </ul>
+  <h2>预警</h2>
+  <table>
+    <thead>
+    <tr><th>规则</th><th>对象</th><th>级别</th><th>状态</th><th class="num">触发值</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="alert : ${alerts}">
+      <td th:text="${alert.ruleCode()}">ALT_BREADTH_COLLAPSE</td>
+      <td th:text="${alert.targetCode()}">MARKET</td>
+      <td th:text="${alert.severity()}">MEDIUM</td>
+      <td th:text="${alert.status()}">CREATED</td>
+      <td class="num" th:text="${alert.triggerValue()}">0</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

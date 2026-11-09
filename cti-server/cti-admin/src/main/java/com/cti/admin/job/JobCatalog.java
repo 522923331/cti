@@ -16,6 +16,13 @@ public final class JobCatalog {
     public static final String PORTFOLIO_RISK = "cti_portfolio_risk_job";
     public static final String RUN_BACKTEST = "cti_run_backtest_job";
     public static final String DAILY_REPORT = "cti_daily_report_job";
+    public static final String SYNC_DERIVATIVES = "cti_sync_derivatives_job";
+    public static final String SYNC_MARKET_OVERVIEW = "cti_sync_market_overview_job";
+    public static final String SYNC_NEWS = "cti_sync_news_job";
+    public static final String SYNC_ONCHAIN = "cti_sync_onchain_job";
+    public static final String BUILD_INTELLIGENCE_SCORE = "cti_build_intelligence_score_job";
+    public static final String BUILD_INTELLIGENCE_ALERT = "cti_build_intelligence_alert_job";
+    public static final String INTELLIGENCE_REPORT = "cti_intelligence_report_job";
 
     private JobCatalog() {
     }
@@ -33,6 +40,13 @@ public final class JobCatalog {
                 new JobCatalogEntry(GENERATE_SIGNAL, "按已收盘数据生成信号并更新研究账户", "4"),
                 new JobCatalogEntry(PORTFOLIO_RISK, "用当前持仓重算相关性和回撤", "4"),
                 new JobCatalogEntry(RUN_BACKTEST, "用全部已收盘历史回测趋势策略的 BASE 成本", "5"),
-                new JobCatalogEntry(DAILY_REPORT, "用最近一个已收盘交易日生成研究报告", "6"));
+                new JobCatalogEntry(DAILY_REPORT, "用最近一个已收盘交易日生成研究报告", "6"),
+                new JobCatalogEntry(SYNC_DERIVATIVES, "采集币安 U 本位已收盘的持仓量、资金费率和主动买卖量", "1.1"),
+                new JobCatalogEntry(SYNC_MARKET_OVERVIEW, "采集 ETHBTC 日线，并记录尚未接入的市场总市值指标", "1.1"),
+                new JobCatalogEntry(SYNC_NEWS, "采集币安官方公告，按标题做规则分类，不生成买卖信号", "1.1"),
+                new JobCatalogEntry(SYNC_ONCHAIN, "链上供应商未配置时标记未接入，不写入净流入", "1.1"),
+                new JobCatalogEntry(BUILD_INTELLIGENCE_SCORE, "用已收盘特征计算 V1.1 趋势、风险、情绪和置信度", "1.1"),
+                new JobCatalogEntry(BUILD_INTELLIGENCE_ALERT, "按已保存的评分和规则生成预警，冷却期内不重复", "1.1"),
+                new JobCatalogEntry(INTELLIGENCE_REPORT, "用已保存的评分生成可追溯的情报日报", "1.1"));
     }
 }

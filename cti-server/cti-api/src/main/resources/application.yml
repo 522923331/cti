@@ -33,6 +33,8 @@ cti:
   binance:
     base-url: https://api.binance.com
     fallback-base-url: https://data-api.binance.vision
+    futures-base-url: https://fapi.binance.com
+    announcement-base-url: https://www.binance.com
     max-retries: 5
     history-days: 800
     request-timeout-seconds: 30

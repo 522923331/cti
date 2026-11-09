@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>研究策略</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>研究策略</h1>
+  <p class="note">这些是 V1.3 的独立策略。它们不写 CTI_TREND_V1 的持仓，也不写原来的回测结果。</p>
+  <table>
+    <thead>
+    <tr><th>代码</th><th>名称</th><th>版本</th><th>参数</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${strategies}">
+      <td th:text="${row.get('strategy_code')}">EMA_TREND</td>
+      <td th:text="${row.get('strategy_name')}">名称</td>
+      <td th:text="${row.get('strategy_version')}">1.0.0</td>
+      <td th:text="${row.get('parameter_json')}">{}</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

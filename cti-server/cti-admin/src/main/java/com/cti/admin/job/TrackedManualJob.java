@@ -6,6 +6,10 @@ import com.cti.backtest.BacktestService;
 import com.cti.backtest.RunSummary;
 import com.cti.common.job.JobTriggerResult;
 import com.cti.common.job.ManualJob;
+import com.cti.data.intelligence.IntelligenceSyncService;
+import com.cti.data.intelligence.NewsSyncService;
+import com.cti.data.intelligence.OnchainSyncService;
+import com.cti.strategy.intelligence.IntelligenceWorkflowService;
 import com.cti.data.sync.MarketSyncService;
 import com.cti.feature.DailyFeatureService;
 import com.cti.portfolio.PortfolioService;
@@ -365,6 +369,188 @@ class DailyReportJob extends TrackedManualJob {
     }
 
     @XxlJob(JobCatalog.DAILY_REPORT)
+    public void job() {
+        finish(run());
+    }
+}
+
+@Component
+class SyncDerivativesJob extends TrackedManualJob {
+
+    private final IntelligenceSyncService intelligence;
+
+    SyncDerivativesJob(JobRunRepository jobRunRepository, StringRedisTemplate redis, IntelligenceSyncService intelligence) {
+        super(jobRunRepository, redis);
+        this.intelligence = intelligence;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.SYNC_DERIVATIVES;
+    }
+
+    @Override
+    protected String doRun() {
+        return intelligence.syncDerivatives();
+    }
+
+    @XxlJob(JobCatalog.SYNC_DERIVATIVES)
+    public void job() {
+        finish(run());
+    }
+}
+
+@Component
+class SyncMarketOverviewJob extends TrackedManualJob {
+
+    private final IntelligenceSyncService intelligence;
+
+    SyncMarketOverviewJob(JobRunRepository jobRunRepository, StringRedisTemplate redis, IntelligenceSyncService intelligence) {
+        super(jobRunRepository, redis);
+        this.intelligence = intelligence;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.SYNC_MARKET_OVERVIEW;
+    }
+
+    @Override
+    protected String doRun() {
+        return intelligence.syncMarketOverview();
+    }
+
+    @XxlJob(JobCatalog.SYNC_MARKET_OVERVIEW)
+    public void job() {
+        finish(run());
+    }
+}
+
+@Component
+class SyncNewsJob extends TrackedManualJob {
+
+    private final NewsSyncService news;
+
+    SyncNewsJob(JobRunRepository jobRunRepository, StringRedisTemplate redis, NewsSyncService news) {
+        super(jobRunRepository, redis);
+        this.news = news;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.SYNC_NEWS;
+    }
+
+    @Override
+    protected String doRun() {
+        return news.sync();
+    }
+
+    @XxlJob(JobCatalog.SYNC_NEWS)
+    public void job() {
+        finish(run());
+    }
+}
+
+@Component
+class SyncOnchainJob extends TrackedManualJob {
+
+    private final OnchainSyncService onchain;
+
+    SyncOnchainJob(JobRunRepository jobRunRepository, StringRedisTemplate redis, OnchainSyncService onchain) {
+        super(jobRunRepository, redis);
+        this.onchain = onchain;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.SYNC_ONCHAIN;
+    }
+
+    @Override
+    protected String doRun() {
+        return onchain.sync();
+    }
+
+    @XxlJob(JobCatalog.SYNC_ONCHAIN)
+    public void job() {
+        finish(run());
+    }
+}
+
+@Component
+class BuildIntelligenceScoreJob extends TrackedManualJob {
+
+    private final IntelligenceWorkflowService intelligence;
+
+    BuildIntelligenceScoreJob(JobRunRepository jobRunRepository, StringRedisTemplate redis, IntelligenceWorkflowService intelligence) {
+        super(jobRunRepository, redis);
+        this.intelligence = intelligence;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.BUILD_INTELLIGENCE_SCORE;
+    }
+
+    @Override
+    protected String doRun() {
+        return intelligence.score();
+    }
+
+    @XxlJob(JobCatalog.BUILD_INTELLIGENCE_SCORE)
+    public void job() {
+        finish(run());
+    }
+}
+
+@Component
+class BuildIntelligenceAlertJob extends TrackedManualJob {
+
+    private final IntelligenceWorkflowService intelligence;
+
+    BuildIntelligenceAlertJob(JobRunRepository jobRunRepository, StringRedisTemplate redis, IntelligenceWorkflowService intelligence) {
+        super(jobRunRepository, redis);
+        this.intelligence = intelligence;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.BUILD_INTELLIGENCE_ALERT;
+    }
+
+    @Override
+    protected String doRun() {
+        return intelligence.alerts();
+    }
+
+    @XxlJob(JobCatalog.BUILD_INTELLIGENCE_ALERT)
+    public void job() {
+        finish(run());
+    }
+}
+
+@Component
+class IntelligenceReportJob extends TrackedManualJob {
+
+    private final IntelligenceWorkflowService intelligence;
+
+    IntelligenceReportJob(JobRunRepository jobRunRepository, StringRedisTemplate redis, IntelligenceWorkflowService intelligence) {
+        super(jobRunRepository, redis);
+        this.intelligence = intelligence;
+    }
+
+    @Override
+    public String name() {
+        return JobCatalog.INTELLIGENCE_REPORT;
+    }
+
+    @Override
+    protected String doRun() {
+        return intelligence.report();
+    }
+
+    @XxlJob(JobCatalog.INTELLIGENCE_REPORT)
     public void job() {
         finish(run());
     }

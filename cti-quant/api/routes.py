@@ -3,6 +3,8 @@ import logging
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from api.schemas import (
     CalculateDailyRequest,
@@ -24,11 +26,20 @@ from api.schemas import (
     SignalResponse,
 )
 from config.settings import settings
+from data.intelligence_loader import load_intelligence_rows
 from data.market_loader import load_market
 from data.score_loader import load_score_inputs
 from data.signal_loader import load_portfolio_risk, load_signal_inputs
+from engines.allocation import AllocationRejected, allocate, correlations
+from engines.assistant import AssistantRejected, assist
+from engines.ensemble import EnsembleRejected, classify_regime, combine
+from engines.experiments import ExperimentRejected, assess_health, run_experiment
+from strategies.library import build
+from strategies.research import research_backtest
 from engines.backtest import STRATEGIES, run_strategy, sensitivity, walk_forward
 from engines.book import run_book
+from engines.intelligence import MODEL_VERSION
+from engines.intelligence import evaluate as evaluate_intelligence
 from engines.risk_engine import money_text
 from engines.score_builder import evaluate
 from engines.weights import text
@@ -251,6 +262,83 @@ def _fill(row) -> dict:
     }
 
 
+@router.post("/api/v1/research/assistant/query")
+def research_assistant(payload: dict):
+    try:
+        return assist(payload)
+    except AssistantRejected as ex:
+        return JSONResponse(status_code=422, content={"error": str(ex)})
+
+
+@router.post("/api/v1/strategies/experiments")
+def run_strategy_experiment(payload: dict):
+    try:
+        return run_experiment(payload)
+    except ExperimentRejected as ex:
+        return JSONResponse(status_code=422, content={"error": str(ex)})
+
+
+@router.post("/api/v1/strategies/health")
+def strategy_health(payload: dict):
+    try:
+        return assess_health(payload.get("snapshot") or {}, payload.get("rules") or {})
+    except ExperimentRejected as ex:
+        return JSONResponse(status_code=422, content={"error": str(ex)})
+
+
+@router.post("/api/v1/strategies/ensemble")
+def ensemble_strategy(payload: dict):
+    try:
+        regime = None
+        if payload.get("observation") is not None:
+            regime = classify_regime(payload["observation"], payload.get("config") or {}, payload.get("index"))
+            payload = dict(payload)
+            payload["direction"] = regime["direction"]
+            payload["volatility"] = regime["volatility"]
+        result = combine(payload)
+    except EnsembleRejected as ex:
+        return JSONResponse(status_code=422, content={"error": str(ex)})
+    if regime is not None:
+        result["direction"] = regime["direction"]
+        result["volatility"] = regime["volatility"]
+    result["modelVersion"] = "ensemble-1.3.0"
+    return result
+
+
+@router.post("/api/v1/strategies/research/evaluate")
+def evaluate_research_strategy(payload: dict):
+    strategy = build(payload["strategyCode"], payload["parameters"])
+    data = {
+        "bars": payload.get("bars") or [],
+        "regime": payload.get("regime"),
+        "assets": payload.get("assets") or [],
+    }
+    generated = strategy.generate_signal(data)
+    signals = generated if isinstance(generated, list) else [generated]
+    book = None
+    if payload.get("bars"):
+        book = research_backtest(
+            strategy,
+            payload["bars"],
+            initial=payload.get("initial", "100"),
+            quantity=payload.get("quantity", "1"),
+            fee_rate=payload.get("feeRate", "0.001"),
+            slippage_bps=payload.get("slippageBps", "8"),
+        )
+    return {"parameters": strategy.get_parameters(), "signals": signals, "book": book}
+
+
+@router.post("/api/v1/portfolio/allocate")
+def allocate_portfolio(payload: dict):
+    try:
+        plan = allocate(payload)
+    except AllocationRejected as ex:
+        return JSONResponse(status_code=422, content={"error": str(ex)})
+    if payload.get("series"):
+        plan["correlation"] = correlations(payload["series"])
+    return plan
+
+
 @router.post("/api/v1/portfolio/risk/calculate", response_model=PortfolioRiskResponse)
 def calculate_portfolio_risk(body: ScoreRequest, loader=Depends(get_risk_loader)) -> PortfolioRiskResponse:
     risk = loader(settings.mysql_url, body.symbols, body.tradeDate)
@@ -331,6 +419,20 @@ def _regime(row) -> RegimeResponse:
         reason=row.reason,
         strategyVersion=settings.strategy_version,
     )
+
+
+class IntelligenceScoreRequest(BaseModel):
+    tradeDate: date | None = None
+
+
+@router.post("/api/v1/intelligence/score/calculate")
+def calculate_intelligence(body: IntelligenceScoreRequest) -> dict:
+    rows = load_intelligence_rows(settings.mysql_url)
+    scored = evaluate_intelligence(rows)
+    if body.tradeDate is not None:
+        scored = [row for row in scored if row["tradeDate"] == body.tradeDate.isoformat()]
+    logger.info("intelligence rows=%s", len(scored))
+    return {"modelVersion": MODEL_VERSION, "rows": scored}
 
 
 def _score(row) -> ScoreResponse:

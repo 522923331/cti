@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>参数实验</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>参数实验</h1>
+  <p class="note">每一组参数都保留。短窗口不能标记通过。健康度只告警，不改正式参数。</p>
+  <table>
+    <thead>
+    <tr><th>等级</th><th>通过</th><th>选中参数</th><th>本组参数</th><th>可用</th><th>被选中</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${rows}">
+      <td th:text="${row.get('grade')}">FULL</td>
+      <td th:text="${row.get('passed')}">0</td>
+      <td th:text="${row.get('selected_json')}">{}</td>
+      <td th:text="${row.get('parameter_json')}">{}</td>
+      <td th:text="${row.get('eligible')}">1</td>
+      <td th:text="${row.get('selected')}">0</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

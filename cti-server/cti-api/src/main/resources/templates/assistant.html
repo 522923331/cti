@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>研究助手</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>研究助手</h1>
+  <p class="note">没有模型服务。解释固定为“未能生成解释”。引用只来自受控查询，缺失保持空白。</p>
+  <table>
+    <thead>
+    <tr><th>问题</th><th>意图</th><th>解释</th><th>来源表</th><th>缺失</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${rows}">
+      <td th:text="${row.get('question')}">问题</td>
+      <td th:text="${row.get('intent_name')}">ensemble</td>
+      <td th:text="${row.get('explanation')}">未能生成解释</td>
+      <td th:text="${row.get('source_table')}">ct_ensemble_result</td>
+      <td th:text="${row.get('missing_json')}">[]</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

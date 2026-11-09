@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>策略融合</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1>策略融合</h1>
+  <p class="note">方向和波动分开记录。高波动只是风险标签。缺失策略不按 0 分计入。</p>
+  <table>
+    <thead>
+    <tr><th>币种</th><th>日期</th><th>方向</th><th>波动</th><th class="num">融合分</th><th class="num">置信度</th><th>信号</th><th>贡献</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${results}">
+      <td th:text="${row.get('symbol')}">BTCUSDT</td>
+      <td th:text="${row.get('trade_date')}">2026-11-05</td>
+      <td th:text="${row.get('direction_regime')}">BULL</td>
+      <td th:text="${row.get('volatility_regime')}">HIGH</td>
+      <td class="num" th:text="${row.get('ensemble_score')}">0</td>
+      <td class="num" th:text="${row.get('confidence')}">0</td>
+      <td th:text="${row.get('signal_name')}">NO_TRADE</td>
+      <td th:text="${row.get('contribution_json')}">[]</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

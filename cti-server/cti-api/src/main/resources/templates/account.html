@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>账户流水</title>
+  <link rel="stylesheet" href="/research.css">
+</head>
+<body>
+<div th:replace="~{nav :: bar}"></div>
+<main>
+  <h1 th:text="${account.accountId()}">账户</h1>
+  <p class="note" th:text="${account.name()} + ' · ' + ${account.type()} + ' · ' + ${account.status()}">状态</p>
+  <p>可用 <span th:text="${account.available().toPlainString()}">0</span>，冻结 <span th:text="${account.frozen().toPlainString()}">0</span>，总额 <span th:text="${account.total().toPlainString()}">0</span></p>
+  <h2>持仓</h2>
+  <table>
+    <thead>
+    <tr><th>币种</th><th class="num">数量</th><th class="num">平均成本</th><th class="num">成本金额</th><th class="num">已实现</th><th class="num">市价</th><th class="num">市值</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${positions}">
+      <td th:text="${row.symbol()}">BTCUSDT</td>
+      <td class="num" th:text="${row.quantity().toPlainString()}">0</td>
+      <td class="num" th:text="${row.averageCost() != null ? row.averageCost().toPlainString() : '—'}">—</td>
+      <td class="num" th:text="${row.costAmount().toPlainString()}">0</td>
+      <td class="num" th:text="${row.realizedPnl().toPlainString()}">0</td>
+      <td class="num" th:text="${row.marketPrice() != null ? row.marketPrice().toPlainString() : '—'}">—</td>
+      <td class="num" th:text="${row.marketValue() != null ? row.marketValue().toPlainString() : '—'}">—</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>模拟订单</h2>
+  <table>
+    <thead>
+    <tr><th>状态</th><th>类型</th><th>方向</th><th>币种</th><th class="num">数量</th><th class="num">已成交</th><th>原因</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${orders}">
+      <td th:text="${row.get('status')}">FILLED</td>
+      <td th:text="${row.get('orderType')}">MARKET</td>
+      <td th:text="${row.get('side')}">BUY</td>
+      <td th:text="${row.get('symbol')}">BTCUSDT</td>
+      <td class="num" th:text="${row.get('quantity')}">0</td>
+      <td class="num" th:text="${row.get('filledQuantity')}">0</td>
+      <td th:text="${row.get('rejectReason')}">—</td>
+    </tr>
+    </tbody>
+  </table>
+  <h2>流水</h2>
+  <table>
+    <thead>
+    <tr><th>请求号</th><th>类型</th><th>币种</th><th class="num">现金变动</th><th class="num">变动后余额</th><th class="num">手续费</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="row : ${ledger}">
+      <td th:text="${row.requestId()}">open</td>
+      <td th:text="${row.type()}">OPENING</td>
+      <td th:text="${row.symbol()}">—</td>
+      <td class="num" th:text="${row.cashDelta().toPlainString()}">0</td>
+      <td class="num" th:text="${row.balanceAfter().toPlainString()}">0</td>
+      <td class="num" th:text="${row.fee().toPlainString()}">0</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>
