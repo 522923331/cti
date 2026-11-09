@@ -24,7 +24,7 @@ services:
       start_period: 20s
 
   redis:
-    image: redis:7
+    image: ${CTI_REDIS_IMAGE:-docker.m.daocloud.io/library/redis:7}
     command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--save", "", "--appendonly", "no"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -78,7 +78,7 @@ services:
       quant:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8081/api/v1/admin/system-health"]
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/8081'"]
       interval: 10s
       timeout: 5s
       retries: 20

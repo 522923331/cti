@@ -1,12 +1,14 @@
-FROM maven:3.9-eclipse-temurin-17 AS build
+ARG MAVEN_IMAGE=docker.m.daocloud.io/library/maven:3.9-eclipse-temurin-17
+ARG JRE_IMAGE=docker.m.daocloud.io/library/eclipse-temurin:17-jre
+FROM ${MAVEN_IMAGE} AS build
 WORKDIR /src
 COPY cti-server /src
-RUN mvn -pl cti-api -am package -DskipTests
+RUN mkdir -p /root/.m2 && printf '%s\n' \
+    '<settings><mirrors><mirror><id>aliyun</id><mirrorOf>*</mirrorOf><url>https://maven.aliyun.com/repository/public</url></mirror></mirrors></settings>' \
+    > /root/.m2/settings.xml \
+    && mvn -pl cti-api -am package -DskipTests
 
-FROM eclipse-temurin:17-jre
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
+FROM ${JRE_IMAGE}
 WORKDIR /opt/cti
 COPY --from=build /src/cti-api/target/cti-api-1.0.0-SNAPSHOT.jar /opt/cti/app.jar
 EXPOSE 8081

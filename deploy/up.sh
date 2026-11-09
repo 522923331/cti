@@ -59,8 +59,42 @@ EOF
   echo "已生成 $env_file。数据库密码写在这个文件里。"
 fi
 
+if [[ -z "${CTI_DOCKER_MIRROR:-}" && -f "$env_file" ]]; then
+  CTI_DOCKER_MIRROR="$(grep -E '^CTI_DOCKER_MIRROR=' "$env_file" | tail -1 | cut -d= -f2- | tr -d '"' | tr -d "'")"
+fi
+
+if [[ -n "${CTI_DOCKER_MIRROR:-}" ]]; then
+  if [[ "$(id -u)" -ne 0 ]]; then
+    echo "配置镜像加速需要 root：sudo CTI_DOCKER_MIRROR=${CTI_DOCKER_MIRROR} bash deploy/up.sh"
+    exit 1
+  fi
+  python3 - "$CTI_DOCKER_MIRROR" <<'PY'
+import json, os, sys
+mirror = sys.argv[1].rstrip("/")
+path = "/etc/docker/daemon.json"
+os.makedirs("/etc/docker", exist_ok=True)
+data = {}
+if os.path.exists(path) and os.path.getsize(path) > 0:
+    with open(path) as handle:
+        data = json.load(handle)
+mirrors = [item for item in data.get("registry-mirrors", []) if item.rstrip("/") != mirror]
+data["registry-mirrors"] = [mirror] + mirrors
+with open(path, "w") as handle:
+    json.dump(data, handle, indent=2)
+    handle.write("\n")
+PY
+  systemctl restart docker
+  echo "已使用镜像加速：${CTI_DOCKER_MIRROR}"
+fi
+
 echo "开始构建并启动 MySQL、Redis、Python 和 Java。第一次构建会下载镜像并编译，需要几分钟。"
-compose up -d --build
+if ! compose up -d --build; then
+  echo
+  echo "拉取 Docker Hub 超时。阿里云 ECS 需要账号自己的镜像加速地址。"
+  echo "打开 https://cr.console.aliyun.com/ 左侧「镜像工具」→「镜像加速器」，复制加速器地址，然后执行："
+  echo "sudo CTI_DOCKER_MIRROR=https://你的ID.mirror.aliyuncs.com bash deploy/up.sh"
+  exit 1
+fi
 
 echo "等待 Java 健康检查。"
 ready=0
