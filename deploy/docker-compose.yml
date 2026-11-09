@@ -16,6 +16,8 @@ services:
       - cti-mysql:/var/lib/mysql
       - ../sql/xxl_job_2.4.0.sql:/docker-entrypoint-initdb.d/01-xxl_job.sql:ro
       - ../sql/xxl_job_cti_seed.sql:/docker-entrypoint-initdb.d/02-xxl_job_cti.sql:ro
+    ports:
+      - "${CTI_MYSQL_BIND:-0.0.0.0:3306}:3306"
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
       interval: 5s
@@ -26,6 +28,8 @@ services:
   redis:
     image: ${CTI_REDIS_IMAGE:-docker.m.daocloud.io/library/redis:7}
     command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--save", "", "--appendonly", "no"]
+    ports:
+      - "${CTI_REDIS_BIND:-0.0.0.0:6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -69,7 +73,7 @@ services:
     volumes:
       - cti-data:/var/lib/cti
     ports:
-      - "${CTI_HTTP_BIND:-127.0.0.1:8081}:8081"
+      - "${CTI_HTTP_BIND:-0.0.0.0:8081}:8081"
     depends_on:
       mysql:
         condition: service_healthy

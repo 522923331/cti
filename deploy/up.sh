@@ -53,7 +53,9 @@ if [[ ! -f "$env_file" ]]; then
   cat > "$env_file" <<EOF
 MYSQL_ROOT_PASSWORD=${root_password}
 MYSQL_PASSWORD=${app_password}
-CTI_HTTP_BIND=127.0.0.1:8081
+CTI_HTTP_BIND=0.0.0.0:8081
+CTI_MYSQL_BIND=0.0.0.0:3306
+CTI_REDIS_BIND=0.0.0.0:6379
 EOF
   chmod 600 "$env_file"
   echo "已生成 $env_file。数据库密码写在这个文件里。"
