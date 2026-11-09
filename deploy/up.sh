@@ -90,8 +90,8 @@ fi
 echo "开始构建并启动 MySQL、Redis、Python 和 Java。第一次构建会下载镜像并编译，需要几分钟。"
 if ! compose up -d --build; then
   echo
-  echo "拉取 Docker Hub 超时。阿里云 ECS 需要账号自己的镜像加速地址。"
-  echo "打开 https://cr.console.aliyun.com/ 左侧「镜像工具」→「镜像加速器」，复制加速器地址，然后执行："
+  echo "构建或启动失败。如果上面是 Java 编译错误，先同步代码再重新运行本脚本。"
+  echo "只有拉取镜像超时或提示 not found 时，才需要镜像加速地址："
   echo "sudo CTI_DOCKER_MIRROR=https://你的ID.mirror.aliyuncs.com bash deploy/up.sh"
   exit 1
 fi
